@@ -41,3 +41,8 @@ typedef struct
     Date paymentDate;
     int FineAmount;
 } Date;
+int main()
+{
+    printf("supppp");
+    return 0;
+}
