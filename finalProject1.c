@@ -1,4 +1,3 @@
-
 #include <gtk/gtk.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,11 +5,13 @@
 #include <stdbool.h>
 
 // ================= STRUCTS =================
-typedef struct {
+typedef struct
+{
     int day, month, year;
 } Date;
 
-typedef struct {
+typedef struct
+{
     int memberId;
     char name[50];
     char nationalId[20];
@@ -19,14 +20,16 @@ typedef struct {
     bool isActive;
 } Member;
 
-typedef struct {
+typedef struct
+{
     int bookId;
     char title[100];
     int totalQuantity;
     int availableQuantity;
 } Book;
 
-typedef struct {
+typedef struct
+{
     int borrowingId;
     int memberId;
     int bookId;
@@ -59,20 +62,25 @@ GtkWidget *entry_book, *entry_search;
 GtkWidget *output_label;
 
 // ================= LOGIN FUNCTION =================
-void check_login(GtkWidget *widget, gpointer window) {
+void check_login(GtkWidget *widget, gpointer window)
+{
     const char *input = gtk_entry_get_text(GTK_ENTRY(login_entry));
 
-    if (atoi(input) == STAFF_ID) {
-        gtk_widget_destroy(GTK_WIDGET(window));   // close login
-        gtk_widget_show_all(main_window);         // show main window
-    } else {
+    if (atoi(input) == STAFF_ID)
+    {
+        gtk_widget_destroy(GTK_WIDGET(window)); // close login
+        gtk_widget_show_all(main_window);       // show main window
+    }
+    else
+    {
         gtk_entry_set_text(GTK_ENTRY(login_entry), "");
         gtk_entry_set_placeholder_text(GTK_ENTRY(login_entry), "❌ Wrong ID");
     }
 }
 
 // ================= REGISTER =================
-void register_member(GtkWidget *widget, gpointer data) {
+void register_member(GtkWidget *widget, gpointer data)
+{
     members = realloc(members, (memberCount + 1) * sizeof(Member));
 
     Member *m = &members[memberCount];
@@ -82,8 +90,8 @@ void register_member(GtkWidget *widget, gpointer data) {
     strcpy(m->nationalId, gtk_entry_get_text(GTK_ENTRY(entry_nid)));
 
     m->isActive = true;
-    m->registrationDate = (Date){1,1,2026};
-    m->membershipExpiry = (Date){1,1,2027};
+    m->registrationDate = (Date){1, 1, 2026};
+    m->membershipExpiry = (Date){1, 1, 2027};
 
     memberCount++;
 
@@ -91,7 +99,8 @@ void register_member(GtkWidget *widget, gpointer data) {
 }
 
 // ================= ADD BOOK =================
-void add_book(GtkWidget *widget, gpointer data) {
+void add_book(GtkWidget *widget, gpointer data)
+{
     books = realloc(books, (bookCount + 1) * sizeof(Book));
 
     Book *b = &books[bookCount];
@@ -108,13 +117,16 @@ void add_book(GtkWidget *widget, gpointer data) {
 }
 
 // ================= BORROW =================
-void borrow_book(GtkWidget *widget, gpointer data) {
-    if (bookCount == 0 || memberCount == 0) {
+void borrow_book(GtkWidget *widget, gpointer data)
+{
+    if (bookCount == 0 || memberCount == 0)
+    {
         gtk_label_set_text(GTK_LABEL(output_label), "❌ Need member & book");
         return;
     }
 
-    if (books[0].availableQuantity <= 0) {
+    if (books[0].availableQuantity <= 0)
+    {
         gtk_label_set_text(GTK_LABEL(output_label), "❌ No stock");
         return;
     }
@@ -127,8 +139,8 @@ void borrow_book(GtkWidget *widget, gpointer data) {
     br->memberId = 1;
     br->bookId = 1;
 
-    br->borrowDate = (Date){1,6,2026};
-    br->dueDate = (Date){7,6,2026};
+    br->borrowDate = (Date){1, 6, 2026};
+    br->dueDate = (Date){7, 6, 2026};
     br->isReturned = false;
     br->fineAmount = 0;
 
@@ -140,23 +152,27 @@ void borrow_book(GtkWidget *widget, gpointer data) {
 }
 
 // ================= RETURN =================
-void return_book(GtkWidget *widget, gpointer data) {
-    if (borrowingCount == 0) {
+void return_book(GtkWidget *widget, gpointer data)
+{
+    if (borrowingCount == 0)
+    {
         gtk_label_set_text(GTK_LABEL(output_label), "❌ No records");
         return;
     }
 
     Borrowing *br = &borrowings[0];
 
-    if (br->isReturned) {
+    if (br->isReturned)
+    {
         gtk_label_set_text(GTK_LABEL(output_label), "❌ Already returned");
         return;
     }
 
-    br->returnDate = (Date){10,6,2026};
+    br->returnDate = (Date){10, 6, 2026};
     br->isReturned = true;
 
-    if (br->returnDate.day > br->dueDate.day) {
+    if (br->returnDate.day > br->dueDate.day)
+    {
         int late = br->returnDate.day - br->dueDate.day;
         br->fineAmount = late * 2;
     }
@@ -167,11 +183,14 @@ void return_book(GtkWidget *widget, gpointer data) {
 }
 
 // ================= SEARCH =================
-void search_book(GtkWidget *widget, gpointer data) {
+void search_book(GtkWidget *widget, gpointer data)
+{
     const char *key = gtk_entry_get_text(GTK_ENTRY(entry_search));
 
-    for (int i = 0; i < bookCount; i++) {
-        if (strstr(books[i].title, key)) {
+    for (int i = 0; i < bookCount; i++)
+    {
+        if (strstr(books[i].title, key))
+        {
             char buffer[200];
             sprintf(buffer, "Found: %s | Available: %d",
                     books[i].title, books[i].availableQuantity);
@@ -185,11 +204,14 @@ void search_book(GtkWidget *widget, gpointer data) {
 }
 
 // ================= REPORT =================
-void report(GtkWidget *widget, gpointer data) {
+void report(GtkWidget *widget, gpointer data)
+{
     int returned = 0, fineTotal = 0;
 
-    for (int i = 0; i < borrowingCount; i++) {
-        if (borrowings[i].isReturned) {
+    for (int i = 0; i < borrowingCount; i++)
+    {
+        if (borrowings[i].isReturned)
+        {
             returned++;
             fineTotal += borrowings[i].fineAmount;
         }
@@ -204,14 +226,15 @@ void report(GtkWidget *widget, gpointer data) {
 }
 
 // ================= MAIN =================
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     gtk_init(&argc, &argv);
 
     // ===== MAIN WINDOW (HIDDEN FIRST) =====
     main_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(main_window), "Library System");
     gtk_window_set_default_size(GTK_WINDOW(main_window), 700, 500);
-    gtk_widget_hide(main_window);  // ✅ IMPORTANT
+    gtk_widget_hide(main_window); // ✅ IMPORTANT
 
     GtkWidget *grid = gtk_grid_new();
     gtk_grid_set_row_spacing(GTK_GRID(grid), 10);
@@ -282,7 +305,7 @@ int main(int argc, char *argv[]) {
     gtk_grid_attach(GTK_GRID(login_grid), login_entry, 0, 0, 1, 1);
     gtk_grid_attach(GTK_GRID(login_grid), login_btn, 0, 1, 1, 1);
 
-    G_signal_connect(login_window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    g_signal_connect(login_window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
     gtk_widget_show_all(login_window); // ✅ ONLY login first
 
