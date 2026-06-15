@@ -11,10 +11,15 @@ typedef struct
 typedef struct
 {
     int memberId;
-    char name[20];
-    char institution[50];
+    char name[50];
+    char institution[100];
+    Date dateOfBirth;
+    char nationalId[10];
+
     Date registrationDate;
-    bool paymentStatus;
+    Date membershipExpiry;
+
+    bool isActive;
 } Member;
 
 typedef struct
@@ -22,27 +27,32 @@ typedef struct
     int borrowingId;
     int memberId;
     int bookId;
+
     Date borrowDate;
+    Date dueDate;
     Date returnDate;
+
+    bool isReturned;
+    int fineAmount;
 } Borrowing;
 
 typedef struct
 {
     int bookId;
-    char title[70];
-    char author[20];
-    int quantity;
-} Books;
+    char title[100];
+    char author[50];
+
+    int totalQuantity;
+    int availableQuantity;
+} Book;
 
 typedef struct
 {
+    int paymentId;
     int memberId;
+
     int amount;
     Date paymentDate;
-    int FineAmount;
-} Date;
-int main()
-{
-    printf("supppp");
-    return 0;
-}
+
+    int yearCovered;
+} MembershipPayment;
